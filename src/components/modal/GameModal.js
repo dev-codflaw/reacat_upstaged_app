@@ -23,7 +23,8 @@ export default function GameModal(props) {
 
     function handleVoteSubmitForP2(){
       alert('Vote P2');
-      fetch('http://127.0.0.1:8000/api-v1/vote-register/', {
+      // fetch('http://127.0.0.1:8000/api-v1/vote-register/', {
+      fetch('http://upstage.codflaw.com/api-v1/vote-register/', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -42,7 +43,8 @@ export default function GameModal(props) {
 
     function handleVoteSubmitForP1(){
       alert('Vote P1');
-      fetch('http://127.0.0.1:8000/api-v1/vote-register/', {
+      // fetch('http://127.0.0.1:8000/api-v1/vote-register/', {
+      fetch('http://upstage.codflaw.com/api-v1/vote-register/', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
