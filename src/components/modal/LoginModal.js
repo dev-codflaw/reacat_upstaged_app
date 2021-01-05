@@ -65,7 +65,7 @@ export default function LoginModal(props) {
     const responseGoogle = async(response) => {
         // let googleResponse  = await googleLogin(response.accessToken)
         // fetch('http://127.0.0.1:8000/api-v1/voter-create/', {
-        fetch('http://upstage.codflaw.com/api-v1/voter-create/', {
+        fetch('https://upstage.codflaw.com/api-v1/voter-create/', {
           method: 'POST',
           headers: {
             'Accept': 'application/json',
