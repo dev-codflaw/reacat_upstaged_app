@@ -16,7 +16,6 @@ export default function MainContainer(props){
         return <LoginModal btn={'Vote'}/>;
       }
 
-      
     return (
         <>
             <Container>

@@ -6,6 +6,14 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Container from 'react-bootstrap/Container'
 import ReactPlayer from 'react-player/youtube'
+import Snackbar from '@material-ui/core/Snackbar';
+import axios from 'axios'
+import MuiAlert from '@material-ui/lab/Alert';
+
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 
 export default function GameModal(props) {
@@ -16,50 +24,68 @@ export default function GameModal(props) {
     const [ isLogin, setIsLogin]  = useState(false);
     const [ email, setEmail]  = useState();
 
+    const [open, setOpen] = React.useState(false);
+    const time = 6000;
+    const close = () => setOpen(false)
+    const [message, setMessage] = React.useState("")
+
     const data = [{p1:'Team A', p1_url:'https://www.youtube.com/watch?v=ysz5S6PUM-U', p1_id:1}];
 
     console.log(data.map((dt) => dt.p1_url));
 
 
     function handleVoteSubmitForP2(){
-      alert('Vote P2');
-      // fetch('http://127.0.0.1:8000/api-v1/vote-register/', {
-      fetch('https://upstage.codflaw.com/api-v1/vote-register/', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // alert('Vote P2');
+      axios({
+        method: 'post',
+        url : 'https://upstage.codflaw.com/api-v1/vote-register/',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+        data: JSON.stringify({
           game: '1',
           voted_for: '#2 Team B',
-          email: email,
-          is_valid: true,
-          source: 'from google'
-        })
-      }) 
+          email : email,
+        }) 
+      }).then(res=> {
+        console.log(res);
+        console.log(res.data);
+        // console.log(res.data['msg']);
+        setMessage(res.data['msg'])
+        setOpen(true)
+        handleClose();
+        // window.location.reload();
+
+      }).catch(error => {
+        console.log(error);
+      });
       
     }
 
     function handleVoteSubmitForP1(){
-      alert('Vote P1');
-      // fetch('http://127.0.0.1:8000/api-v1/vote-register/', {
-      fetch('https://upstage.codflaw.com/api-v1/vote-register/', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // alert('Vote P1');
+      axios({
+        method: 'post',
+        url : 'https://upstage.codflaw.com/api-v1/vote-register/',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+        data: JSON.stringify({
           game: '1',
           voted_for: '#1 Team A',
-          email: email,
-          is_valid: true,
-          source: 'from google'
-        })
-      }) 
-      
+          email : email,
+        }) 
+      }).then(res=> {
+        console.log(res);
+        console.log(res.data);
+        // console.log(res.data['msg']);
+        setMessage(res.data['msg'])
+        setOpen(true)
+        handleClose();
+        // window.location.reload();
+
+      }).catch(error => {
+        console.log(error);
+      });
+
     }
+
     useEffect(() => {
       const user_data = JSON.parse(localStorage.getItem('isUserLogged'));
       if(user_data && user_data.login){
@@ -74,7 +100,13 @@ export default function GameModal(props) {
         <Button variant="primary" onClick={handleShow}>
           {props.btn}
         </Button>
-  
+
+        <Snackbar open={open} autoHideDuration={time} onClose={close}>
+          <Alert onClose={close} severity="success">
+            {message}
+          </Alert>
+        </Snackbar>
+
         <Modal
           show={show}
           onHide={handleClose}

@@ -8,17 +8,27 @@ import GoogleLogin from 'react-google-login';
 import FacebookLogin from 'react-facebook-login';
 import Form from 'react-bootstrap/Form'
 import './LoginModal.css'
+import Snackbar from '@material-ui/core/Snackbar';
+import axios from 'axios'
+import MuiAlert from '@material-ui/lab/Alert';
 
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function LoginModal(props) {
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
     const [name, setName] = React.useState("");
     const [email, setEmail] = React.useState("");
     const [error, setError] = React.useState(null);
-
+    const [open, setOpen] = React.useState(false);
+    const time = 6000;
+    const close = () => setOpen(false)
+    const [message, setMessage] = React.useState("")
 
     const handleSubmit = e => {
         e.preventDefault();
@@ -33,7 +43,7 @@ export default function LoginModal(props) {
             }
             localStorage.setItem('isUserLogged', JSON.stringify(data));
             handleClose();
-            window.location.reload(false)
+            window.location.reload()
 
         }
         else{
@@ -56,7 +66,7 @@ export default function LoginModal(props) {
         // console.log(googleResponse);
         console.log(response);
         handleClose();
-        window.location.reload(false)
+        window.location.reload()
 
       }
       
@@ -64,20 +74,31 @@ export default function LoginModal(props) {
       
     const responseGoogle = async(response) => {
         // let googleResponse  = await googleLogin(response.accessToken)
-        // fetch('http://127.0.0.1:8000/api-v1/voter-create/', {
-        fetch('https://upstage.codflaw.com/api-v1/voter-create/', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+
+        axios({
+          method: 'post',
+          url : 'https://upstage.codflaw.com/api-v1/voter-create/',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json'},
+          data: JSON.stringify({
             name: response.profileObj.name,
             email: response.profileObj.email,
             is_valid: true,
             source: 'from google'
-          })
-        }) 
+          }) 
+        }).then(res=> {
+          console.log(res);
+          console.log(res.data);
+          // console.log(res.data['msg']);
+          setMessage(res.data['msg'])
+          setOpen(true)
+          handleClose();
+          window.location.reload();
+
+        }).catch(error => {
+          console.log(error);
+        });
+
+
         localStorage.setItem('isUserLogged', JSON.stringify({
           login:true,
           loginType: 'google',
@@ -87,15 +108,13 @@ export default function LoginModal(props) {
         }));
         // console.log(googleResponse);
  
-        console.log(response);
-        console.log(response.profileObj.email);
-        handleClose();
-        window.location.reload(false)
+        // console.log(response);
+        // console.log(response.profileObj.email);
+        // handleClose();
 
       }
   
     const fresponseGoogle = async(response) => {
-
         console.log(response);
       }
 
@@ -105,7 +124,13 @@ export default function LoginModal(props) {
         <Button variant="primary" onClick={handleShow}>
           {props.btn}
         </Button>
-  
+
+        <Snackbar open={open} autoHideDuration={time} onClose={close}>
+          <Alert onClose={close} severity="success">
+            {message}
+          </Alert>
+        </Snackbar>
+        
         <Modal
           show={show}
           onHide={handleClose}
@@ -132,23 +157,23 @@ export default function LoginModal(props) {
                   </Button>
                   </Form> */}
                 
-                <div className="text-center">
+                {/* <div className="text-center">
                     <Button>LOGIN WITH EMAIL</Button>
+                </div><br /> */}
+                <div className="text-center">
+                    <GoogleLogin
+                    clientId="17134391804-9ofvalms637k71u7s45gl4i21o1sjp6j.apps.googleusercontent.com"
+                    buttonText="LOGIN WITH GOOGLE"
+                    onSuccess={responseGoogle}
+                    onFailure={fresponseGoogle}
+                    />
                 </div><br />
                 <div className="text-center">
-                  <GoogleLogin
-                  clientId="17134391804-9ofvalms637k71u7s45gl4i21o1sjp6j.apps.googleusercontent.com"
-                  buttonText="LOGIN WITH GOOGLE"
-                  onSuccess={responseGoogle}
-                  onFailure={fresponseGoogle}
-                  />
-                </div><br />
-                <div className="text-center">
-                  <FacebookLogin
-                  appId="296526531782242"
-                  fields="name,email,picture"
-                  callback={responseFacebook}
-                  />
+                    {/* <FacebookLogin
+                    appId="296526531782242"
+                    fields="name,email,picture"
+                    callback={responseFacebook}
+                    /> */}
                 </div><br />
                 
                
@@ -159,7 +184,6 @@ export default function LoginModal(props) {
             <div className="">
               <a href="#">Terms of Service</a> and 
               <a href="#"> Privacy Policy</a>
-
             </div>
           </Modal.Footer>
         </Modal>
